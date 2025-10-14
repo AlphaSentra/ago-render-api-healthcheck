@@ -27,10 +27,10 @@ module.exports = {
 async function getHealth(URL) {
   try {
     const res = await axios.get(URL);
-    console.log('🚀 ~ file: index.js:19 ~ res.data:', res.data);
     return res.data;
   } catch (error) {
-    // Error logging removed for test cleanliness
+    console.log(`🚀 ~ file: index.js:23 ~ error:`, error);
+    throw error;
   }
 }
 
@@ -39,4 +39,3 @@ function sum(a, b) {
   return a + b;
 }
 
-module.exports = { sum, getHealth };

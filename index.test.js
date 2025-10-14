@@ -14,7 +14,6 @@ let originalConsole;
 
 beforeAll(() => {
   originalConsole = global.console;
-  global.console = { log: jest.fn() };
   jest.useFakeTimers();
 });
 
@@ -29,22 +28,11 @@ beforeEach(() => {
   jest.clearAllTimers();
 });
 
-afterEach(async () => {
-  // Fast-forward all pending timers
+afterEach(() => {
   jest.runAllTimers();
-  
-  // Stop all scheduler instances
-  cron.schedule.mock.results.forEach(result => {
-    result.value.stop();
-  });
-  
-  // Clear all mocks and timers
-  jest.clearAllMocks();
   jest.clearAllTimers();
-  
-  // Flush any pending promises
-  await new Promise(resolve => process.nextTick(resolve));
-}, 20000);
+  jest.resetAllMocks();
+});
 
 // Existing sum tests
 test('adds 1 + 2 to equal 3', () => {
@@ -75,9 +63,7 @@ describe('getHealth', () => {
     axios.get.mockRejectedValue(new Error(errorMessage));
     const consoleSpy = jest.spyOn(console, 'log');
 
-    await getHealth(testURL).catch(error => {
-      expect(error.message).toBe(errorMessage);
-    });
+    await expect(getHealth(testURL)).rejects.toThrow(errorMessage);
     
     expect(axios.get).toHaveBeenCalledWith(testURL);
     expect(consoleSpy).toHaveBeenCalledWith(
