@@ -22,5 +22,8 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Run tests
-      run: npm test
+    - name: Load .env file
+      run: echo "URLS=$(grep URLS .env | cut -d '=' -f2)" >> $GITHUB_ENV
+
+    - name: Ping URLs
+      run: npm run ping
