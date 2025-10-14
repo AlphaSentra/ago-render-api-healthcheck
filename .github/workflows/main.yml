@@ -5,6 +5,8 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  schedule:
+    - cron: '*/14 * * * *'  # Runs every 14 minutes
 
 jobs:
   build:
@@ -23,3 +25,24 @@ jobs:
 
     - name: Run tests
       run: npm test
+
+  ping:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'  # Only run on scheduled triggers
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Execute health check
+      run: npm run ping
+      env:
+        URLS: ${{ secrets.RENDER_URLS }}  # Make sure to set this secret in repo settings

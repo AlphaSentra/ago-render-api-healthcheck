@@ -8,9 +8,12 @@ const CronExpression = {
   EVERY_14_MINUTES: '0 */14 * * * *',
 };
 
-cron.schedule(CronExpression.EVERY_14_MINUTES, async () => {
-  await Promise.all(URLs.map((url) => getHealth(url)));
-});
+// Only start cron job in non-test environments
+if (process.env.NODE_ENV !== 'test') {
+  cron.schedule(CronExpression.EVERY_14_MINUTES, async () => {
+    await Promise.all(URLs.map((url) => getHealth(url)));
+  });
+}
 
 async function getHealth(URL) {
   try {
@@ -21,3 +24,10 @@ async function getHealth(URL) {
     console.log('🚀 ~ file: index.js:23 ~ error:', error);
   }
 }
+
+// Simple function for testing
+function sum(a, b) {
+  return a + b;
+}
+
+module.exports = { sum, getHealth };
