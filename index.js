@@ -1,7 +1,17 @@
 require('dotenv').config();
 const axios = require('axios');
+const cron = require('node-cron');
 
 const URLs = process.env.URLS.split(',');
+
+// Schedule health checks every 5 minutes
+cron.schedule('*/5 * * * *', () => {
+  URLs.forEach(url => {
+    getHealth(url)
+      .then(data => console.log(`Health check for ${url}:`, data))
+      .catch(err => console.error(`Error checking ${url}:`, err));
+  });
+});
 
 module.exports = {
   sum,
@@ -22,4 +32,3 @@ async function getHealth(URL) {
 function sum(a, b) {
   return a + b;
 }
-
