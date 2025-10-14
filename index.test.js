@@ -1,43 +1,44 @@
 const { sum, getHealth } = require('./index');
 const axios = require('axios');
+const cron = require('node-cron');
 
 jest.mock('axios');
-
-const { scheduler } = require('./index');
+jest.mock('node-cron', () => ({
+  schedule: jest.fn(() => ({
+    start: jest.fn(),
+    stop: jest.fn()
+  }))
+}));
 
 let originalConsole;
 
 beforeAll(() => {
   originalConsole = global.console;
   global.console = { log: jest.fn() };
-  scheduler.stop();
   jest.useFakeTimers();
 });
 
 afterAll(() => {
   global.console = originalConsole;
-  if (scheduler) {
-    scheduler.stop();
-  }
   jest.useRealTimers();
 });
 
 beforeEach(() => {
   jest.clearAllMocks();
-  if (scheduler) {
-    scheduler.stop();
-  }
+  cron.schedule.mockClear();
   jest.clearAllTimers();
 });
 
 afterEach(async () => {
-  if (scheduler) {
-    scheduler.stop();
-  }
+  // Stop all scheduler instances created during tests
+  cron.schedule.mock.results.forEach(result => {
+    if (result.value && typeof result.value.stop === 'function') {
+      result.value.stop();
+    }
+  });
   jest.clearAllTimers();
-  // Flush any pending promises
   await new Promise(resolve => setImmediate(resolve));
-});
+}, 10000);
 
 // Existing sum tests
 test('adds 1 + 2 to equal 3', () => {
@@ -68,7 +69,7 @@ describe('getHealth', () => {
     axios.get.mockRejectedValue(new Error(errorMessage));
     const consoleSpy = jest.spyOn(console, 'log');
 
-    await getHealth(testURL);
+    await expect(getHealth(testURL)).rejects.toThrow(errorMessage);
     
     expect(axios.get).toHaveBeenCalledWith(testURL);
     expect(consoleSpy).toHaveBeenCalledWith(
