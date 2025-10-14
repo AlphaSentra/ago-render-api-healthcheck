@@ -1,6 +1,6 @@
 # Keep Alive: Render
 
-[Keep Alive: Render](#) is a simple script to keep your [Render free tier](https://render.com/free) from [going to sleep](https://render.com/docs/free#spinning-down-on-idle) by sending a request to your service(s) at 14-minute intervals.
+[Keep Alive: Render](#) is a simple script to keep your [Render free tier](https://render.com/free) from [going to sleep](https://render.com/docs/free#spinning-down-on-idle) by sending a request to your service(s) at 5-minute intervals.
 
 <details><summary>Something to note</summary>
 
