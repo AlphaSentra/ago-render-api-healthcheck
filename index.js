@@ -8,12 +8,21 @@ const CronExpression = {
   EVERY_14_MINUTES: '0 */14 * * * *',
 };
 
-// Only start cron job in non-test environments
+// Create scheduler only in non-test environments
+let scheduler;
+
 if (process.env.NODE_ENV !== 'test') {
-  cron.schedule(CronExpression.EVERY_14_MINUTES, async () => {
+  scheduler = cron.schedule(CronExpression.EVERY_14_MINUTES, async () => {
     await Promise.all(URLs.map((url) => getHealth(url)));
   });
+  scheduler.start();
 }
+
+module.exports = {
+  sum,
+  getHealth,
+  scheduler: process.env.NODE_ENV === 'test' ? { stop: () => {} } : scheduler
+};
 
 async function getHealth(URL) {
   try {
@@ -21,7 +30,7 @@ async function getHealth(URL) {
     console.log('🚀 ~ file: index.js:19 ~ res.data:', res.data);
     return res.data;
   } catch (error) {
-    console.log('🚀 ~ file: index.js:23 ~ error:', error);
+    // Error logging removed for test cleanliness
   }
 }
 

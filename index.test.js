@@ -3,8 +3,40 @@ const axios = require('axios');
 
 jest.mock('axios');
 
+const { scheduler } = require('./index');
+
+let originalConsole;
+
+beforeAll(() => {
+  originalConsole = global.console;
+  global.console = { log: jest.fn() };
+  scheduler.stop();
+  jest.useFakeTimers();
+});
+
+afterAll(() => {
+  global.console = originalConsole;
+  if (scheduler) {
+    scheduler.stop();
+  }
+  jest.useRealTimers();
+});
+
 beforeEach(() => {
   jest.clearAllMocks();
+  if (scheduler) {
+    scheduler.stop();
+  }
+  jest.clearAllTimers();
+});
+
+afterEach(async () => {
+  if (scheduler) {
+    scheduler.stop();
+  }
+  jest.clearAllTimers();
+  // Flush any pending promises
+  await new Promise(resolve => setImmediate(resolve));
 });
 
 // Existing sum tests
