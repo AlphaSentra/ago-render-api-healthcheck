@@ -4,8 +4,8 @@ const cron = require('node-cron');
 
 const URLs = process.env.URLS.split(',');
 
-// Schedule health checks every 5 hours
-cron.schedule('*/300 * * * *', () => {
+// Schedule health checks every 1 minutes
+cron.schedule('*/1 * * * *', () => {
   URLs.forEach(url => {
     getHealth(url)
       .then(data => console.log(`Health check for ${url}:`, data))
