@@ -49,6 +49,13 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
+    - name: Debug env variables
+      run: |
+        echo "OWNER=$GITHUB_REPOSITORY_OWNER"
+        echo "REPO=$GITHUB_REPOSITORY"
+        echo "RUN_ID=$GITHUB_RUN_ID"
+        echo "TOKEN=${GITHUB_TOKEN:0:4}..."  # Mask token for security
+
     - name: Run workflow cleanup
       run: node index.js
       env:
