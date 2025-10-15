@@ -2,13 +2,13 @@ name: CI
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # Runs every 5 minutes
+    - cron: '*/1 * * * *'  # Runs every 1 minutes
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
 jobs:
-  build:
+  ping:
     runs-on: ubuntu-latest
 
     steps:
@@ -30,36 +30,3 @@ jobs:
 
     - name: Ping URLs
       run: npm run ping
-
-  cleanup:
-    runs-on: ubuntu-latest
-    needs: build
-    permissions:
-      actions: write  # Required to delete workflow runs
-      contents: read  # Required to checkout code
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Use Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Debug env variables
-      run: |
-        echo "OWNER=$GITHUB_REPOSITORY_OWNER"
-        echo "REPO=$GITHUB_REPOSITORY"
-        echo "RUN_ID=$GITHUB_RUN_ID"
-        echo "TOKEN=${GITHUB_TOKEN:0:4}..."  # Mask token for security
-
-    - name: Run workflow cleanup
-      run: node index.js
-      env:
-        GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
-        GITHUB_REPOSITORY: ${{ github.repository }}
-        GITHUB_RUN_ID: ${{ github.run_id }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
