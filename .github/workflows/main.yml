@@ -1,4 +1,4 @@
-name: CI
+name: ago-render-Health-Check
 
 on:
   schedule:
