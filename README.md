@@ -31,6 +31,12 @@ cp sample.env .env
 
 - Replace the value of `URLS` in the `.env` with that of your service(s). For multiple services, separate them with a comma.
 
+- To use these environment variables in GitHub Actions, register them as repository secrets:
+  1. Go to your repository on GitHub
+  2. Click Settings → Secrets and variables → Actions
+  3. Under Repository secrets, click "New repository secret"
+  4. Enter each variable name and value from your `.env` file
+  5. These secrets will be available in your workflows as `${{ secrets.VARIABLE_NAME }}`
 - Start the script with your favourite package manager.
 
 With npm: 
