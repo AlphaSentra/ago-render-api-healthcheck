@@ -25,8 +25,8 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Load .env file
-      run: echo "URLS=$(grep URLS .env | cut -d '=' -f2)" >> $GITHUB_ENV
+    - name: Create .env from secrets
+      run: echo "URLS=${{ secrets.URLS }}" > .env
 
     - name: Ping URLs
       run: npm run ping
