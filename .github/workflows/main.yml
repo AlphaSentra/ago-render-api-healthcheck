@@ -53,13 +53,20 @@ jobs:
 
             console.log(`Checking for failed workflow runs in ${owner}/${repo}...`);
 
-            const workflows = await github.paginate(
-              github.rest.actions.listWorkflowRunsForRepo,
-              { owner, repo, per_page, status: "failure" }
-            );
+            // Get both failed and cancelled runs
+            const statuses = ["failure", "cancelled"];
+            let workflows = [];
+            
+            for (const status of statuses) {
+              const runs = await github.paginate(
+                github.rest.actions.listWorkflowRunsForRepo,
+                { owner, repo, per_page, status }
+              );
+              workflows = workflows.concat(runs);
+            }
 
             if (workflows.length === 0) {
-              console.log("No failed workflow runs found.");
+              console.log("No failed or cancelled workflow runs found.");
               return;
             }
 
@@ -70,7 +77,7 @@ jobs:
                 run_id: run.id,
               });
               deleted++;
-              console.log(`Deleted failed run: ${run.name} (#${run.id})`);
+              console.log(`Deleted ${run.status} run: ${run.name} (#${run.id})`);
             }
 
-            console.log(`Total deleted: ${deleted} failed runs.`);
+            console.log(`Total deleted: ${deleted} failed/cancelled runs.`);
