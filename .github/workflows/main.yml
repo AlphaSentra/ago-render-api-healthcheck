@@ -2,7 +2,8 @@ name: ago-render-Health-Check
 
 on:
   schedule:
-    - cron: '0 */5 * * *'  # Runs every 5 hours
+    - cron: '0 */5 * * *'  # Runs every 5 hours (ping)
+    - cron: '0 * * * *'    # Runs every hour (cleanup)
   push:
     branches: [ main ]
   pull_request:
@@ -10,6 +11,7 @@ on:
 jobs:
   ping:
     runs-on: ubuntu-latest
+    if: github.event.schedule == '0 */5 * * *' || github.event_name != 'schedule'
 
     steps:
     - uses: actions/checkout@v4
@@ -30,3 +32,45 @@ jobs:
 
     - name: Ping URLs
       run: npm run ping
+
+  cleanup:
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 * * * *'
+
+    permissions:
+      actions: write
+      contents: read
+
+    steps:
+      - name: Delete failed workflow runs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const per_page = 100;
+            let deleted = 0;
+
+            console.log(`Checking for failed workflow runs in ${owner}/${repo}...`);
+
+            const workflows = await github.paginate(
+              github.rest.actions.listWorkflowRunsForRepo,
+              { owner, repo, per_page, status: "failure" }
+            );
+
+            if (workflows.length === 0) {
+              console.log("No failed workflow runs found.");
+              return;
+            }
+
+            for (const run of workflows) {
+              await github.rest.actions.deleteWorkflowRun({
+                owner,
+                repo,
+                run_id: run.id,
+              });
+              deleted++;
+              console.log(`Deleted failed run: ${run.name} (#${run.id})`);
+            }
+
+            console.log(`Total deleted: ${deleted} failed runs.`);
