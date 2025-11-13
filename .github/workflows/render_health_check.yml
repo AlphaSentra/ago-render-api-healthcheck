@@ -1,4 +1,4 @@
-name: ago-render-Health-Check
+name: Render Webservice Health-Check
 
 on:
   schedule:
