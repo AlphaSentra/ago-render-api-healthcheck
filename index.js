@@ -38,7 +38,7 @@ async function getHealth(URL) {
     const healthData = res.data;
     return healthData;
   } catch (error) {
-    console.log(`🚀 ~ file: index.js:23 ~ error:`, error);
+    console.log(` ~ file: index.js:23 ~ error:`, error);
     throw error;
   }
 }
