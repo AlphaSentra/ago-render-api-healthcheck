@@ -9,7 +9,7 @@ let executionCount = 0;
 
 const job = cron.schedule('*/14 * * * *', () => {
   
-  if (executionCount <= 25) {
+  if (executionCount < 25) {
     console.log(`Running health check #${executionCount + 1}`);
     
     URLs.forEach(url => {
@@ -20,7 +20,7 @@ const job = cron.schedule('*/14 * * * *', () => {
     executionCount++;
   }
   else {
-    console.log('Reached maximum 25 executions.');
+    console.log('Reached maximum executions.');
     job.stop();
     process.exit(0);
   }
