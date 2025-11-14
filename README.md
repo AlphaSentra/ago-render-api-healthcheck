@@ -1,5 +1,6 @@
 # Render: Health Check
-A Node.js service that performs scheduled health checks on Render-hosted services to keep them active within the free tier limits. The service:
+A Node.js service that performs scheduled health checks on Render-hosted services.
+The service:
 - Runs automated health checks every 14 minutes
 - Supports monitoring multiple services simultaneously
 - Automatically stops after 25 executions (~5.8 hours total runtime)
