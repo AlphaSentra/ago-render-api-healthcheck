@@ -20,7 +20,7 @@ const job = cron.schedule('*/14 * * * *', () => {
     executionCount++;
   }
   else {
-    console.log('Reached maximum 25 executions. Stopping job.');
+    console.log('Reached maximum 25 executions.');
     job.stop();
     process.exit(0);
   }
