@@ -4,24 +4,27 @@ const cron = require('node-cron');
 
 const URLs = process.env.URLS.split(',');
 
-// Schedule health checks every 14 minutes (max 24 executions)
+// Schedule health checks every 14 minutes (max 25 executions)
 let executionCount = 0;
 
 const job = cron.schedule('*/14 * * * *', () => {
-  console.log(`Running health check #${executionCount + 1}`);
   
-  URLs.forEach(url => {
-    getHealth(url)
-      .then(data => console.log(`Health check for ${url}:`, data))
-      .catch(err => console.error(`Error checking ${url}:`, err));
-  });
-
-  executionCount++;
-  
-  if (executionCount >= 24) {
-    console.log('Reached maximum 24 executions. Stopping job.');
-    job.stop();
+  if (executionCount <= 25) {
+    console.log(`Running health check #${executionCount + 1}`);
+    
+    URLs.forEach(url => {
+      getHealth(url)
+        .then(data => console.log(`Health check for ${url}:`, data))
+        .catch(err => console.error(`Error checking ${url}:`, err));
+    });
+    executionCount++;
   }
+  else {
+    console.log('Reached maximum 25 executions. Stopping job.');
+    job.stop();
+    process.exit(0);
+  }
+
 });
 
 module.exports = {
